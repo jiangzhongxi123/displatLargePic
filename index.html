@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>大尺寸广告图展示</title>
+  </head>
+  <body>
+    <div id="ad1" style="width:400px;height:400px;overflow:hidden;">
+      <canvas width='400' height='100'></canvas>
+      <canvas width='400' height='100'></canvas>
+      <canvas width='400' height='100'></canvas>
+      <canvas width='400' height='100'></canvas>
+    </div>
+    <div id="ad2" style="width:500px;height:700px;overflow:hidden">
+      <canvas width='500' height='80'></canvas>
+      <canvas width='500' height='80'></canvas>
+      <canvas width='500' height='80'></canvas>
+      <canvas width='500' height='80'></canvas>
+      <canvas width='500' height='80'></canvas>
+      <canvas width='500' height='80'></canvas>
+      <canvas width='500' height='80'></canvas>
+      <canvas width='500' height='80'></canvas>
+      <canvas width='500' height='80'></canvas>
+    </div>
+    <script>
+      'use strict';
+
+      function drawLargeImage($container, imageSrc) { // 由于单个canvas尺寸有限所以利用多个canvas拼接来显示一张大图
+        let canvasNodes = new Array(); // 存储所有canvas
+        $container.childNodes.forEach((item)=>{
+          if(item.nodeName == 'CANVAS'){
+            canvasNodes.push(item);
+          }
+        });
+        canvasNodes.forEach(function(item, index){
+          item.style.marginTop= '-5px'; // canvas 间会默认5px间距，这样设置后才能无缝吻合
+          var imgObj = new Image();
+          imgObj.src = imageSrc;
+          imgObj.alt = '图片加载中。。';
+          let rawHeight = imgObj.height; // 图片原始高度
+          imgObj.height = rawHeight/canvasNodes.length; // 一个canvas中显示的图片大小
+          if(item.getContext){
+            let context = item.getContext("2d"); // 绘图容器上下文
+            imgObj.onload = function(){// 待图片加载完后，将其显示在canvas上
+              context.drawImage(imgObj, 0, -index*(imgObj.height));// 通过坐标位置上移来缝合
+            }
+          }else{
+            console.log('浏览器不支持绘图');
+          }
+        });
+      }
+      drawLargeImage(document.getElementById('ad1'), 'https://gw.alicdn.com/tfs/TB163pKdMmTBuNjy1XbXXaMrVXa-400-400.jpg');
+      drawLargeImage(document.getElementById('ad2'), 'https://gw.alicdn.com/tfs/TB1EaOddKuSBuNjy1XcXXcYjFXa-500-700.jpg');
+    </script>
+  </body>
+</html>
